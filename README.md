@@ -1,9 +1,9 @@
 <a href="https://lhc-prog.github.io/">
   <picture>
-    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg">
-    <source media="(max-width: 600px)" srcset="./assets/header-light-mobile.svg">
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg">
-    <img src="./assets/header-light.svg" width="100%" alt="LHC-PROG · 计算机专业本科生，关注机器学习。Code. Experiment. Understand.">
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg?v=20261104-clean">
+    <source media="(max-width: 600px)" srcset="./assets/header-light-mobile.svg?v=20261104-clean">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg?v=20261104-clean">
+    <img src="./assets/header-light.svg?v=20261104-clean" width="100%" alt="LHC-PROG">
   </picture>
 </a>
 
@@ -15,13 +15,13 @@
 
 中南大学 · 计算机科学与技术 · 大三在读
 
-`具身智能` · `机器学习` · `X-VLA` · `PyTorch`
+`具身智能` · `机器学习` · `3D 视觉` · `医学影像处理`
 
 ## 研究实践
 
 在课题组参与 **X-VLA** 跨域 Soft Prompt 共享与 **VGGT** 几何蒸馏方向研究。
 
-覆盖基准：`CALVIN` · `LIBERO` · `RoboTwin2` · `VLABench`
+覆盖六域：`Google Robot` · `CALVIN` · `LIBERO` · `WidowX` · `RoboTwin2` · `VLABench`
 
 - **基线复现** — X-VLA 六域部署与系统性评测，建立完整评测链路
 - **方法实现** — Soft Prompt 蒸馏（参数级 · 行为级 · 轨迹级）· GI-RGD · GCRP · Spatial Forcing
@@ -37,8 +37,6 @@
   <img src="./assets/linux.svg" height="36" alt="Linux">
   <img src="./assets/git.svg" height="36" alt="Git">
 </p>
-
-`Python` · `C/C++` · `Java` · `PyTorch` · `Linux` · `Git`
 
 ## 协作实践
 
