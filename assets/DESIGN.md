@@ -11,6 +11,6 @@
 
 未复制第三方图片或组件；不包含脚本、远程字体、统计服务及星芒标志。
 
-横幅与 MiniCamp 卡片使用程序绘制的流线曲面。横幅按钮标注“访问个人主页”，MiniCamp 按钮标注“查看活动官网”，两张卡片整体均为对应目标的链接。Profile 顶部不再重复展示文字导航。小屏素材在 1000px 以下切换，以保持按钮文字可读。
+横幅与 MiniCamp 卡片使用与个人主页相同的三维空间点阵。横幅按钮标注“访问个人主页”，MiniCamp 按钮标注“查看活动官网”，两张卡片整体均为对应目标的链接。Profile 顶部不再重复展示文字导航。小屏素材在 1000px 以下切换，以保持按钮文字可读。
 
-旧 [ARTWORK.md](ARTWORK.md) 与 orbit-art.webp 仅保留为历史素材，不再在页面加载。
+本轮还阅读了 [CSS Design Awards：Long Hoang](https://www.cssdesignawards.com/sites/long-hoang/50243/)、[Curated：Yehor Kosinov](https://curated.design/sites/s/65119/)、[Lapa Ninja Portfolio](https://www.lapa.ninja/category/portfolio/) 和 [Mobbin](https://mobbin.com/) 的公开内容，归纳姓名优先、统一网格、明确动作入口的设计原则；未复制其素材或代码，未访问付费内容。旧环带与流线素材已删除。

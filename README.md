@@ -1,9 +1,9 @@
 <a href="https://lhc-prog.github.io/" title="访问个人主页">
   <picture>
-    <source media="(max-width: 1000px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg?v=20261104-flow4">
-    <source media="(max-width: 1000px)" srcset="./assets/header-light-mobile.svg?v=20261104-flow4">
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg?v=20261104-flow4">
-    <img src="./assets/header-light.svg?v=20261104-flow4" width="100%" alt="LHC-PROG · 访问个人主页 ↗">
+    <source media="(max-width: 1000px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg?v=20261105-spatial2">
+    <source media="(max-width: 1000px)" srcset="./assets/header-light-mobile.svg?v=20261105-spatial2">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg?v=20261105-spatial2">
+    <img src="./assets/header-light.svg?v=20261105-spatial2" width="100%" alt="LHC-PROG · 访问个人主页 ↗">
   </picture>
 </a>
 
@@ -38,9 +38,9 @@
 
 <a href="https://ttesestt.nanocamp.club/minicamp/" title="查看 MiniCamp 活动官网">
   <picture>
-    <source media="(max-width: 1000px) and (prefers-color-scheme: dark)" srcset="./assets/minicamp-dark-mobile.svg?v=20261104-flow4">
-    <source media="(max-width: 1000px)" srcset="./assets/minicamp-light-mobile.svg?v=20261104-flow4">
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/minicamp-dark.svg?v=20261104-flow4">
-    <img src="./assets/minicamp-light.svg?v=20261104-flow4" width="100%" alt="MiniCamp · 查看活动官网 ↗">
+    <source media="(max-width: 1000px) and (prefers-color-scheme: dark)" srcset="./assets/minicamp-dark-mobile.svg?v=20261105-spatial2">
+    <source media="(max-width: 1000px)" srcset="./assets/minicamp-light-mobile.svg?v=20261105-spatial2">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/minicamp-dark.svg?v=20261105-spatial2">
+    <img src="./assets/minicamp-light.svg?v=20261105-spatial2" width="100%" alt="MiniCamp · 查看活动官网 ↗">
   </picture>
 </a>
