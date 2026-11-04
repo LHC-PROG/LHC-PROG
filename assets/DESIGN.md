@@ -10,3 +10,5 @@
 - [GitHub 官方排版指南](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github)：使用 picture 提供主题适配图片。
 
 未复制第三方图片或组件；不包含脚本、远程字体、统计服务及星芒标志。
+
+当前横幅与 MiniCamp 卡片共用原创银蓝环带艺术图像，仅保留大标题与入口箭头；Profile 顶部重复导航已删除。素材来源与完整提示词见 [ARTWORK.md](ARTWORK.md)。

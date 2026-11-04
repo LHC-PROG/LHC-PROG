@@ -1,17 +1,11 @@
 <a href="https://lhc-prog.github.io/">
   <picture>
-    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg?v=20261104-clean">
-    <source media="(max-width: 600px)" srcset="./assets/header-light-mobile.svg?v=20261104-clean">
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg?v=20261104-clean">
-    <img src="./assets/header-light.svg?v=20261104-clean" width="100%" alt="LHC-PROG">
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/header-dark-mobile.svg?v=20261104-art3">
+    <source media="(max-width: 600px)" srcset="./assets/header-light-mobile.svg?v=20261104-art3">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/header-dark.svg?v=20261104-art3">
+    <img src="./assets/header-light.svg?v=20261104-art3" width="100%" alt="LHC-PROG">
   </picture>
 </a>
-
-<p align="center">
-  <a href="https://lhc-prog.github.io/"><b>个人主页 ↗</b></a>
-  &nbsp;&nbsp; · &nbsp;&nbsp;
-  <a href="https://ttesestt.nanocamp.club/minicamp/"><b>MiniCamp ↗</b></a>
-</p>
 
 中南大学 · 计算机科学与技术 · 大三在读
 
@@ -44,9 +38,9 @@
 
 <a href="https://ttesestt.nanocamp.club/minicamp/">
   <picture>
-    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/minicamp-dark-mobile.svg">
-    <source media="(max-width: 600px)" srcset="./assets/minicamp-light-mobile.svg">
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/minicamp-dark.svg">
-    <img src="./assets/minicamp-light.svg" width="100%" alt="查看 MiniCamp 黑客松活动 ↗">
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/minicamp-dark-mobile.svg?v=20261104-art3">
+    <source media="(max-width: 600px)" srcset="./assets/minicamp-light-mobile.svg?v=20261104-art3">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/minicamp-dark.svg?v=20261104-art3">
+    <img src="./assets/minicamp-light.svg?v=20261104-art3" width="100%" alt="查看 MiniCamp 黑客松活动 ↗">
   </picture>
 </a>
