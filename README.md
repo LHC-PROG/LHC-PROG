@@ -38,9 +38,9 @@
 
 <a href="https://ttesestt.nanocamp.club/minicamp/" title="MiniCamp · 查看活动官网 ↗">
   <picture>
-    <source media="(max-width:1000px) and (prefers-reduced-motion:reduce)" srcset="./assets/minicamp-mobile.png?v=20261105-grove3">
-    <source media="(prefers-reduced-motion:reduce)" srcset="./assets/minicamp.png?v=20261105-grove3">
-    <source media="(max-width:1000px)" srcset="./assets/minicamp-mobile.gif?v=20261105-grove3">
-    <img src="./assets/minicamp.gif?v=20261105-grove3" width="100%" alt="MiniCamp · 查看活动官网 ↗">
+    <source media="(max-width:1000px) and (prefers-reduced-motion:reduce)" srcset="./assets/minicamp-mobile.png?v=20261105-grove3b">
+    <source media="(prefers-reduced-motion:reduce)" srcset="./assets/minicamp.png?v=20261105-grove3b">
+    <source media="(max-width:1000px)" srcset="./assets/minicamp-mobile.gif?v=20261105-grove3b">
+    <img src="./assets/minicamp.gif?v=20261105-grove3b" width="100%" alt="MiniCamp · 查看活动官网 ↗">
   </picture>
 </a>
