@@ -21,8 +21,31 @@ OUTPUTS = {}
 KINDS = ['intro','about']
 
 
-def text(x, y, value, size=25, color=None, weight=400, family=SANS, italic=False):
-    return f'<text x="{x}" y="{y}" fill="{color or P["ink"]}" font-family="{family}" font-size="{size}" font-weight="{weight}"' + (' font-style="italic"' if italic else '') + f'>{html.escape(value)}</text>'
+from fontTools.ttLib import TTFont
+from fontTools.pens.svgPathPen import SVGPathPen
+
+FONT_DATA={}
+for key,filename in [('cn','ma-shan-zheng-profile.ttf'),('en','fraunces-italic.woff2')]:
+    font=TTFont(ROOT/'tools'/'fonts'/filename)
+    FONT_DATA[key]=(font,font.getGlyphSet(),font.getBestCmap(),font['head'].unitsPerEm)
+OUTLINE_DEFS={}
+
+
+def text(x,y,value,size=25,color=None,weight=400,family=SANS,italic=False):
+    cursor=0;parts=[]
+    for ch in value:
+        if ch=='·':
+            parts.append(f'<circle cx="{cursor+size*.24:.2f}" cy="{-size*.31:.2f}" r="{size*.045:.2f}"/>');cursor+=size*.48;continue
+        key='cn' if ord(ch)>255 else 'en'
+        font,glyphs,cmap,units=FONT_DATA[key]
+        if ord(ch) not in cmap:raise ValueError('Missing artistic glyph: '+ch)
+        name=cmap[ord(ch)];gid='glyph-'+key+'-'+format(ord(ch),'x');scale=size/units
+        if gid not in OUTLINE_DEFS:
+            pen=SVGPathPen(glyphs,ntos=lambda v:format(v,'.2f').rstrip('0').rstrip('.') if v else '0')
+            glyphs[name].draw(pen);OUTLINE_DEFS[gid]=f'<path id="{gid}" d="{pen.getCommands()}"/>'
+        parts.append(f'<use href="#{gid}" transform="translate({cursor:.2f} 0) scale({scale:.6f} {-scale:.6f})"/>')
+        cursor+=font['hmtx'][name][0]*scale
+    return f'<g data-label="{html.escape(value,quote=True)}" aria-label="{html.escape(value,quote=True)}" fill="{color or P["ink"]}" transform="translate({x} {y})">'+''.join(parts)+'</g>'
 
 
 def width(value, size):
@@ -104,28 +127,29 @@ def landscape(x, y, w, h, night, compact=False):
 
 def shell(kind, w, h, parts, label):
     title = html.escape(label)
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-labelledby="title"><title id="title">{title}</title><defs><clipPath id="card"><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26"/></clipPath></defs><g clip-path="url(#card)"><rect width="{w}" height="{h}" fill="{P["paper"]}"/>{"".join(parts)}</g><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26" fill="none" stroke="{P["line"]}" stroke-width="1.5"/></svg>'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-labelledby="title"><title id="title">{title}</title><defs>{"".join(OUTLINE_DEFS.values())}<clipPath id="card"><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26"/></clipPath></defs><g clip-path="url(#card)"><rect width="{w}" height="{h}" fill="{P["paper"]}"/>{"".join(parts)}</g><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26" fill="none" stroke="{P["line"]}" stroke-width="1.5"/></svg>'
 
 
-def invitation(x,y,label,size=26):
-    w=width(label,size)+65
-    return text(x,y,label,size)+arrow(x+w-20,y-20,18)+rule(x,y+16,x+w)
+def invitation(x,y,label,size=29):
+    w=max(272,width(label,size)+104);h=64;top=y-43
+    return f'<rect x="{x}" y="{top}" width="{w}" height="{h}" rx="{h/2}" fill="#fcfaef" stroke="{P["line"]}"/>'+text(x+27,y,label,size,'#243d32')+arrow(x+w-43,top+22,18,'#243d32')
 
 
 def build(kind,mobile,night):
     global P
+    OUTLINE_DEFS.clear()
     P=PALETTES['night' if night else 'day']
     w,pad=(480,28) if mobile else (960,42)
     if kind=='intro':
         h=500 if mobile else 330
         art=landscape(0,328,w,172,night,compact=True) if mobile else landscape(605,0,355,h,night)
-        parts=[art,text(pad,81 if mobile else 92,DATA['name'],62 if mobile else 76,family=SERIF,italic=True),text(pad,139 if mobile else 156,DATA['identity'],26,P['muted']),text(pad,185 if mobile else 202,DATA['major'],26,P['muted']),invitation(pad,275 if mobile else 275,'进入个人主页',28 if mobile else 27)]
+        parts=[art,text(pad,81 if mobile else 92,DATA['name'],62 if mobile else 76,family=SERIF,italic=True),text(pad,139 if mobile else 156,DATA['identity'],29,P['muted']),text(pad,185 if mobile else 202,DATA['major'],29,P['muted']),invitation(pad,275 if mobile else 275,'进入个人主页',30 if mobile else 29)]
     else:
         h=350 if mobile else 230
         if mobile:
-            parts=[text(pad,58,'研究兴趣',26,P['accent']),text(pad,112,'具身智能 · 3D 视觉',30),text(pad,157,'医学影像',30),rule(pad,194,w-pad),text(pad,246,'热爱',26,P['accent']),text(pad,300,' · '.join(DATA['hobbies']),29)]
+            parts=[text(pad,58,'研究兴趣',26,P['accent']),text(pad,112,'具身智能 · 3D 视觉',30),text(pad,157,'医学影像处理',32),rule(pad,194,w-pad),text(pad,246,DATA['hobby_label'],28,P['accent']),text(pad,300,' · '.join(DATA['hobbies']),29)]
         else:
-            parts=[tree(895,286,.55,.14),text(pad,86,'研究兴趣',25,P['accent']),text(192,86,' · '.join(DATA['interests']),30),rule(pad,121,w-pad),text(pad,178,'热爱',25,P['accent']),text(192,178,' · '.join(DATA['hobbies']),30)]
+            parts=[tree(895,286,.55,.14),text(pad,86,'研究兴趣',25,P['accent']),text(192,86,' · '.join(DATA['interests']),30),rule(pad,121,w-pad),text(pad,178,DATA['hobby_label'],27,P['accent']),text(192,178,' · '.join(DATA['hobbies']),30)]
     return shell(kind,w,h,parts,DATA['name']+' · '+('夜林' if night else '晨光'))
 
 
@@ -152,7 +176,7 @@ def main():
     assert ASSETS.resolve().is_relative_to(ROOT.resolve())
     for file in ASSETS.glob('*.svg'):
         if re.fullmatch(r'(intro|about|research|skills|vision3d|medical|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():file.unlink()
-    cards=[picture('intro','LHC-PROG · 中南大学 · 24级本科生 · 计算机科学与技术。点击进入我的个人主页。',DATA['homepage']),picture('about','研究兴趣：具身智能、3D 视觉、医学影像。热爱：创造、游戏、咖啡、音乐。')]
+    cards=[picture('intro','LHC-PROG · 中南大学 · 24级本科生 · 计算机科学与技术。点击进入我的个人主页。',DATA['homepage']),picture('about','研究兴趣：具身智能、3D 视觉、医学影像处理。My热爱：创造、游戏、咖啡、音乐。')]
     (ROOT/'README.md').write_text('\n\n'.join('<p>\n'+card+'\n</p>' for card in cards)+'\n',encoding='utf-8',newline='\n')
     total=sum((ASSETS/OUTPUTS[k,False,False]).stat().st_size for k in KINDS)
     print('Two static cards; desktop day payload:',total,'bytes; light, dark and mobile variants generated.')
