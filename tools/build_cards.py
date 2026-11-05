@@ -18,6 +18,7 @@ PALETTES = {
 SANS = "'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif"
 SERIF = "Georgia,'Times New Roman',serif"
 OUTPUTS = {}
+KINDS = ['intro','skills','research','vision3d','medical','minicamp']
 
 
 def text(x, y, value, size=25, color=None, weight=400, family=SANS, italic=False):
@@ -156,16 +157,34 @@ def build(kind, mobile, night):
                 y=116+i*91;parts += [text(pad,y,item['title'],23,P['muted']),text(pad,y+41,item['tools'],29),rule(pad,y+61,w-pad) if i<2 else '']
             else:
                 x=pad+i*300;parts += [text(x,121,item['title'],23,P['muted']),text(x,170,item['tools'],27)]
+    elif kind in ['vision3d','medical']:
+        topic=DATA['vision3d' if kind=='vision3d' else 'medicalImaging']
+        parts += [text(pad,65,topic['title'],34,weight=600),text(pad,113,topic['subtitle'],27 if mobile else 24,P['accent'])]
+        if not mobile:parts += [text(w-198,65,'了解方向',23,P['muted']),arrow(w-66,46,17,P['muted'])]
+        y=170
+        if mobile:
+            for i,keyword in enumerate(topic['keywords']):
+                x=pad+(i%2)*219 if kind=='medical' else pad
+                row=i//2 if kind=='medical' else i
+                parts.append(text(x,y+row*46,keyword,29))
+            y+=46*(math.ceil(len(topic['keywords'])/2) if kind=='medical' else len(topic['keywords']))
+        else:
+            x=pad
+            for keyword in topic['keywords']:
+                span=width(keyword,28)
+                if x+span>w-pad:x=pad;y+=49
+                parts.append(text(x,y,keyword,28));x+=span+36
+            y+=49
+        parts.append(rule(pad,y+5,w-pad));y+=51
+        p,y=paragraph(pad,y,topic['description'],w-2*pad,29 if mobile else 25,46 if mobile else 41,P['muted']);parts.append(p)
+        if mobile:parts.append(button(pad,y+8,'了解方向',23));y+=85
+        h=y+27
     else:
-        h=460 if mobile else 265
-        parts += [landscape(0,310,w,h-310,night,compact=True) if mobile else landscape(605,0,355,h,night)]
-        if mobile:parts.append(f'<rect width="480" height="310" fill="{P["paper"]}"/>')
-        parts += [text(pad,55,'校园协作 · 2026',23,P['muted']),text(pad,117,'MiniCamp',56,family=SERIF,italic=True)]
-        phrase='活动统筹 · 宣传执行' if mobile else '活动统筹 · 宣传执行 · 现场协作 · 赞助对接'
-        parts.append(text(pad,164,phrase,25 if mobile else 23))
-        if mobile:parts.append(text(pad,204,'现场协作 · 赞助对接',25))
-        parts.append(button(pad,233 if mobile else 191,'查看活动官网',23,h=54))
-    return shell(kind,w,h,parts,{'intro':'LHC-PROG','research':'研究实践','skills':'技术能力','minicamp':'MiniCamp'}[kind]+' · '+('夜林' if night else '晨光'))
+        description,y=paragraph(pad,171,DATA['practice']['description'],w-2*pad if mobile else 520,27 if mobile else 23,44 if mobile else 36)
+        button_y=y+8;content_bottom=button_y+78;h=content_bottom+150 if mobile else content_bottom
+        parts += [landscape(0,content_bottom,w,150,night,compact=True) if mobile else landscape(605,0,355,h,night)]
+        parts += [text(pad,55,'校园创新 · 2026',23,P['muted']),text(pad,117,'MiniCamp',56,family=SERIF,italic=True),description,button(pad,button_y,'查看活动官网',23,h=54)]
+    return shell(kind,w,h,parts,{'intro':'LHC-PROG','research':'研究实践','skills':'技术能力','vision3d':'3D 视觉','medical':'医学影像处理','minicamp':'MiniCamp'}[kind]+' · '+('夜林' if night else '晨光'))
 
 
 def picture(kind, alt, link=None):
@@ -181,7 +200,7 @@ def picture(kind, alt, link=None):
 
 
 def main():
-    for kind in ['intro','research','skills','minicamp']:
+    for kind in KINDS:
         for mobile in [False,True]:
             for night in [False,True]:
                 suffix=('-night' if night else '-day')+('-mobile' if mobile else '')
@@ -190,23 +209,27 @@ def main():
                 OUTPUTS[kind,mobile,night]=name
                 (ASSETS/name).write_text(content,encoding='utf-8',newline='\n')
     for file in ASSETS.glob('*.svg'):
-        if re.fullmatch(r'(intro|research|skills|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():
+        if re.fullmatch(r'(intro|research|skills|vision3d|medical|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():
             file.unlink()
     cards=[
         picture('intro','LHC-PROG · 中南大学计算机科学与技术本科生。具身智能、机器学习、3D 视觉、医学影像处理。访问个人主页 ↗','https://lhc-prog.github.io/'),
-        picture('research','研究实践 · X-VLA 跨域 Soft Prompt 共享与 VGGT 几何注入；六域部署、方法实现、诊断与追溯。阅读研究详情 ↗','https://lhc-prog.github.io/#research'),
         picture('skills','技术能力：Python、C/C++、Java、PyTorch、Linux、Git。'),
-        picture('minicamp','MiniCamp 2026 校园黑客松 · 活动统筹、宣传、现场执行与赞助对接。查看活动官网 ↗',DATA['practice']['url']),
+        picture('research','研究实践 · X-VLA 跨域 Soft Prompt 共享与 VGGT 几何注入；六域部署、方法实现、诊断与追溯。阅读研究详情 ↗','https://lhc-prog.github.io/#research'),
+        picture('vision3d','3D 视觉 · 三维重建、实时 SLAM、3D Gaussian Splatting、MonoGS、MultiSlam。了解关注方向 ↗','https://lhc-prog.github.io/#vision3d'),
+        picture('medical','医学影像处理 · 多模态融合、器官分割、病灶检测、图像配准。了解关注方向 ↗','https://lhc-prog.github.io/#medical-imaging'),
+        picture('minicamp','MiniCamp 2026 · 校园黑客松，让技术爱好者组队交流，将想法转化为原型。查看活动官网 ↗',DATA['practice']['url']),
     ]
     body='\n\n'.join('<p>\n'+card+'\n</p>' for card in cards)
-    native=['<details>','<summary>文字介绍</summary>','','中南大学 · 计算机科学与技术本科生','',' · '.join(DATA['interests']),'','## 研究实践','',DATA['research']['description'],'','覆盖六域：'+' · '.join(DATA['research']['domains']),'']
+    native=['<details>','<summary>文字介绍</summary>','','中南大学 · 计算机科学与技术本科生','',' · '.join(DATA['interests']),'','## 技术能力','','Python · C/C++ · Java · PyTorch · Linux · Git','','## 研究实践','',DATA['research']['description'],'','覆盖六域：'+' · '.join(DATA['research']['domains']),'']
     native += ['- **'+i['title']+'** — '+i['text'] for i in DATA['research']['contributions']]
     native += ['','## 主要发现','']+['- **'+i['title']+'** — '+i['text'] for i in DATA['research']['findings']]
-    native += ['','## 技术能力','','Python · C/C++ · Java · PyTorch · Linux · Git','','## 协作实践','','MiniCamp 2026 校园黑客松。'+DATA['practice']['description'],'','</details>']
+    for key in ['vision3d','medicalImaging']:
+        topic=DATA[key];native+=['','## '+topic['title'],'',topic['subtitle'],'',' · '.join(topic['keywords']),'',topic['description']]
+    native += ['','## MiniCamp','','MiniCamp 2026。'+DATA['practice']['description'],'','</details>']
     body+='\n\n'+'\n'.join(native)+'\n'
     (ROOT/'README.md').write_text(body,encoding='utf-8',newline='\n')
-    total=sum((ASSETS/OUTPUTS[kind,False,False]).stat().st_size for kind in ['intro','research','skills','minicamp'])
-    print('Four static cards; desktop day payload:',total,'bytes; mobile, light and dark variants generated.')
+    total=sum((ASSETS/OUTPUTS[kind,False,False]).stat().st_size for kind in KINDS)
+    print('Six static cards; desktop day payload:',total,'bytes; mobile, light and dark variants generated.')
 
 
 if __name__=='__main__':
