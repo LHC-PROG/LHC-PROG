@@ -18,7 +18,7 @@ PALETTES = {
 SANS = "'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif"
 SERIF = "Georgia,'Times New Roman',serif"
 OUTPUTS = {}
-KINDS = ['intro','skills','research','vision3d','medical','minicamp']
+KINDS = ['intro','about']
 
 
 def text(x, y, value, size=25, color=None, weight=400, family=SANS, italic=False):
@@ -107,130 +107,55 @@ def shell(kind, w, h, parts, label):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-labelledby="title"><title id="title">{title}</title><defs><clipPath id="card"><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26"/></clipPath></defs><g clip-path="url(#card)"><rect width="{w}" height="{h}" fill="{P["paper"]}"/>{"".join(parts)}</g><rect x="1" y="1" width="{w-2}" height="{h-2}" rx="26" fill="none" stroke="{P["line"]}" stroke-width="1.5"/></svg>'
 
 
-def build(kind, mobile, night):
+def invitation(x,y,label,size=26):
+    w=width(label,size)+65
+    return text(x,y,label,size)+arrow(x+w-20,y-20,18)+rule(x,y+16,x+w)
+
+
+def build(kind,mobile,night):
     global P
-    P = PALETTES['night' if night else 'day']
-    w, pad = (480, 28) if mobile else (960, 42)
-    parts = []
-    if kind == 'intro':
-        h = 500 if mobile else 310
-        parts += [landscape(0,333,w,h-333,night,compact=True) if mobile else landscape(605,0,355,h,night)]
-        if mobile:
-            parts += [f'<rect width="480" height="333" fill="{P["paper"]}"/>', text(pad,68,'LHC-PROG',61,family=SERIF,italic=True),text(pad,113,'中南大学',24,P['muted']),text(pad,151,'计算机科学与技术本科生',24,P['muted']),text(pad,206,'具身智能 · 机器学习',26),text(pad,249,'3D 视觉 · 医学影像处理',26),button(pad,278,'访问个人主页',23)]
-        else:
-            parts += [text(pad,78,'LHC-PROG',66,family=SERIF,italic=True),text(pad,122,DATA['identity'],23,P['muted']),text(pad,171,'具身智能 · 机器学习',25),text(pad,209,'3D 视觉 · 医学影像处理',25),button(pad,236,'访问个人主页',22,h=50)]
-    elif kind == 'research':
-        y=65
-        parts += [text(pad,y,'研究实践',34,weight=600),text(pad,126,'X-VLA × VGGT',45,family=SERIF)]
-        if not mobile:parts += [text(w-198,65,'阅读研究',23,P['muted']),arrow(w-66,46,17,P['muted'])]
-        desc='跨域 Soft Prompt 共享与 VGGT 几何注入。'
-        p,y=paragraph(pad,178,desc,w-2*pad,29 if mobile else 25,46 if mobile else 42);parts.append(p);y+=18
-        if mobile:
-            entries=[('基线复现','六域部署与系统评测；贯通模型服务、动作转换与结果记录。'),('方法实现','Soft Prompt 蒸馏\n参数级 · 行为级 · 轨迹级\n几何注入\nGI-RGD · GCRP\nSpatial Forcing'),('诊断与追溯','梯度分析、模块隔离与参数替换；交叉诊断损失曲线、表征相关性与 rollout 行为。')]
-            for heading,body in entries:
-                parts += [rule(pad,y,w-pad),text(pad,y+45,heading,29,weight=600)]
-                p,end=paragraph(pad,y+87,body,w-2*pad,29,46,P['muted']);parts.append(p);y=end+24
-        else:
-            entries=[('基线复现','六域模型部署与系统评测，贯通模型服务、动作转换与结果记录。'),('方法实现','Soft Prompt 蒸馏\n参数 · 行为 · 轨迹\nGI-RGD · GCRP\nSpatial Forcing'),('诊断与追溯','梯度分析、模块隔离与参数替换；表征相关性与 rollout 行为追踪。')]
-            parts.append(rule(pad,y,w-pad));bottoms=[]
-            for i,(heading,body) in enumerate(entries):
-                x=pad+i*300;parts.append(text(x,y+50,heading,27,weight=600));p,end=paragraph(x,y+94,body,260,24,40,P['muted']);parts.append(p);bottoms.append(end)
-            y=max(bottoms)+20
-        parts += [rule(pad,y,w-pad),text(pad,y+44,'六域评测',25,weight=600)];y+=91
-        if mobile:
-            for i,name in enumerate(DATA['research']['domains']):
-                x=pad+(i%2)*219;row=i//2
-                parts.append(text(x,y+row*45,name,28,P['muted']))
-            y+=132
-            parts.append(button(pad,y,'阅读研究详情',23));y+=82
-        else:
-            x=pad
-            for name in DATA['research']['domains']:
-                parts.append(text(x,y,name,23,P['muted']));x+=width(name,23)+29
-            y+=39
-        h=y+17
-    elif kind == 'skills':
-        h=392 if mobile else 226
-        parts.append(text(pad,62,'技术能力',34,weight=600))
-        for i,item in enumerate(DATA['skills']):
-            if mobile:
-                y=116+i*91;parts += [text(pad,y,item['title'],23,P['muted']),text(pad,y+41,item['tools'],29),rule(pad,y+61,w-pad) if i<2 else '']
-            else:
-                x=pad+i*300;parts += [text(x,121,item['title'],23,P['muted']),text(x,170,item['tools'],27)]
-    elif kind in ['vision3d','medical']:
-        topic=DATA['vision3d' if kind=='vision3d' else 'medicalImaging']
-        parts += [text(pad,65,topic['title'],34,weight=600),text(pad,113,topic['subtitle'],27 if mobile else 24,P['accent'])]
-        if not mobile:parts += [text(w-198,65,'了解方向',23,P['muted']),arrow(w-66,46,17,P['muted'])]
-        y=170
-        if mobile:
-            for i,keyword in enumerate(topic['keywords']):
-                x=pad+(i%2)*219 if kind=='medical' else pad
-                row=i//2 if kind=='medical' else i
-                parts.append(text(x,y+row*46,keyword,29))
-            y+=46*(math.ceil(len(topic['keywords'])/2) if kind=='medical' else len(topic['keywords']))
-        else:
-            x=pad
-            for keyword in topic['keywords']:
-                span=width(keyword,28)
-                if x+span>w-pad:x=pad;y+=49
-                parts.append(text(x,y,keyword,28));x+=span+36
-            y+=49
-        parts.append(rule(pad,y+5,w-pad));y+=51
-        p,y=paragraph(pad,y,topic['description'],w-2*pad,29 if mobile else 25,46 if mobile else 41,P['muted']);parts.append(p)
-        if mobile:parts.append(button(pad,y+8,'了解方向',23));y+=85
-        h=y+27
+    P=PALETTES['night' if night else 'day']
+    w,pad=(480,28) if mobile else (960,42)
+    if kind=='intro':
+        h=500 if mobile else 330
+        art=landscape(0,328,w,172,night,compact=True) if mobile else landscape(605,0,355,h,night)
+        parts=[art,text(pad,81 if mobile else 92,DATA['name'],62 if mobile else 76,family=SERIF,italic=True),text(pad,139 if mobile else 156,DATA['identity'],26,P['muted']),text(pad,185 if mobile else 202,DATA['major'],26,P['muted']),invitation(pad,275 if mobile else 275,'进入个人主页',28 if mobile else 27)]
     else:
-        description,y=paragraph(pad,171,DATA['practice']['description'],w-2*pad if mobile else 520,27 if mobile else 23,44 if mobile else 36)
-        button_y=y+8;content_bottom=button_y+78;h=content_bottom+150 if mobile else content_bottom
-        parts += [landscape(0,content_bottom,w,150,night,compact=True) if mobile else landscape(605,0,355,h,night)]
-        parts += [text(pad,55,'校园创新 · 2026',23,P['muted']),text(pad,117,'MiniCamp',56,family=SERIF,italic=True),description,button(pad,button_y,'查看活动官网',23,h=54)]
-    return shell(kind,w,h,parts,{'intro':'LHC-PROG','research':'研究实践','skills':'技术能力','vision3d':'3D 视觉','medical':'医学影像处理','minicamp':'MiniCamp'}[kind]+' · '+('夜林' if night else '晨光'))
+        h=350 if mobile else 230
+        if mobile:
+            parts=[text(pad,58,'研究兴趣',26,P['accent']),text(pad,112,'具身智能 · 3D 视觉',30),text(pad,157,'医学影像',30),rule(pad,194,w-pad),text(pad,246,'热爱',26,P['accent']),text(pad,300,' · '.join(DATA['hobbies']),29)]
+        else:
+            parts=[tree(895,286,.55,.14),text(pad,86,'研究兴趣',25,P['accent']),text(192,86,' · '.join(DATA['interests']),30),rule(pad,121,w-pad),text(pad,178,'热爱',25,P['accent']),text(192,178,' · '.join(DATA['hobbies']),30)]
+    return shell(kind,w,h,parts,DATA['name']+' · '+('夜林' if night else '晨光'))
 
 
-def picture(kind, alt, link=None):
-    def image(mobile,night):
-        return './assets/cards/'+OUTPUTS[kind,mobile,night]
-    value=f'''<picture>
-  <source media="(max-width:1000px) and (prefers-color-scheme:dark)" srcset="{image(True,True)}">
-  <source media="(max-width:1000px)" srcset="{image(True,False)}">
-  <source media="(prefers-color-scheme:dark)" srcset="{image(False,True)}">
-  <img src="{image(False,False)}" width="100%" alt="{html.escape(alt,quote=True)}">
+def picture(kind,alt,link=None):
+    def asset(mobile,night):return './assets/cards/'+OUTPUTS[kind,mobile,night]
+    content=f'''<picture>
+  <source media="(max-width:1000px) and (prefers-color-scheme:dark)" srcset="{asset(True,True)}">
+  <source media="(max-width:1000px)" srcset="{asset(True,False)}">
+  <source media="(prefers-color-scheme:dark)" srcset="{asset(False,True)}">
+  <img src="{asset(False,False)}" width="100%" alt="{html.escape(alt,quote=True)}">
 </picture>'''
-    return f'<a href="{link}" title="{html.escape(alt,quote=True)}">\n{value}\n</a>' if link else value
+    return f'<a href="{link}" title="{html.escape(alt,quote=True)}">\n{content}\n</a>' if link else content
 
 
 def main():
     for kind in KINDS:
         for mobile in [False,True]:
             for night in [False,True]:
-                suffix=('-night' if night else '-day')+('-mobile' if mobile else '')
                 content=build(kind,mobile,night)
-                name=kind+suffix+'-'+hashlib.sha256(content.encode()).hexdigest()[:10]+'.svg'
+                name=kind+('-night' if night else '-day')+('-mobile' if mobile else '')+'-'+hashlib.sha256(content.encode()).hexdigest()[:10]+'.svg'
                 OUTPUTS[kind,mobile,night]=name
                 (ASSETS/name).write_text(content,encoding='utf-8',newline='\n')
+    # Delete only generator-owned card names inside this repository's card directory.
+    assert ASSETS.resolve().is_relative_to(ROOT.resolve())
     for file in ASSETS.glob('*.svg'):
-        if re.fullmatch(r'(intro|research|skills|vision3d|medical|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():
-            file.unlink()
-    cards=[
-        picture('intro','LHC-PROG · 中南大学计算机科学与技术本科生。具身智能、机器学习、3D 视觉、医学影像处理。访问个人主页 ↗','https://lhc-prog.github.io/'),
-        picture('skills','技术能力：Python、C/C++、Java、PyTorch、Linux、Git。'),
-        picture('research','研究实践 · X-VLA 跨域 Soft Prompt 共享与 VGGT 几何注入；六域部署、方法实现、诊断与追溯。阅读研究详情 ↗','https://lhc-prog.github.io/#research'),
-        picture('vision3d','3D 视觉 · 三维重建、实时 SLAM、3D Gaussian Splatting、MonoGS、MultiSlam。了解关注方向 ↗','https://lhc-prog.github.io/#vision3d'),
-        picture('medical','医学影像处理 · 多模态融合、器官分割、病灶检测、图像配准。了解关注方向 ↗','https://lhc-prog.github.io/#medical-imaging'),
-        picture('minicamp','MiniCamp 2026 · 校园黑客松，让技术爱好者组队交流，将想法转化为原型。查看活动官网 ↗',DATA['practice']['url']),
-    ]
-    body='\n\n'.join('<p>\n'+card+'\n</p>' for card in cards)
-    native=['<details>','<summary>文字介绍</summary>','','中南大学 · 计算机科学与技术本科生','',' · '.join(DATA['interests']),'','## 技术能力','','Python · C/C++ · Java · PyTorch · Linux · Git','','## 研究实践','',DATA['research']['description'],'','覆盖六域：'+' · '.join(DATA['research']['domains']),'']
-    native += ['- **'+i['title']+'** — '+i['text'] for i in DATA['research']['contributions']]
-    native += ['','## 主要发现','']+['- **'+i['title']+'** — '+i['text'] for i in DATA['research']['findings']]
-    for key in ['vision3d','medicalImaging']:
-        topic=DATA[key];native+=['','## '+topic['title'],'',topic['subtitle'],'',' · '.join(topic['keywords']),'',topic['description']]
-    native += ['','## MiniCamp','','MiniCamp 2026。'+DATA['practice']['description'],'','</details>']
-    body+='\n\n'+'\n'.join(native)+'\n'
-    (ROOT/'README.md').write_text(body,encoding='utf-8',newline='\n')
-    total=sum((ASSETS/OUTPUTS[kind,False,False]).stat().st_size for kind in KINDS)
-    print('Six static cards; desktop day payload:',total,'bytes; mobile, light and dark variants generated.')
+        if re.fullmatch(r'(intro|about|research|skills|vision3d|medical|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():file.unlink()
+    cards=[picture('intro','LHC-PROG · 中南大学 · 24级本科生 · 计算机科学与技术。点击进入我的个人主页。',DATA['homepage']),picture('about','研究兴趣：具身智能、3D 视觉、医学影像。热爱：创造、游戏、咖啡、音乐。')]
+    (ROOT/'README.md').write_text('\n\n'.join('<p>\n'+card+'\n</p>' for card in cards)+'\n',encoding='utf-8',newline='\n')
+    total=sum((ASSETS/OUTPUTS[k,False,False]).stat().st_size for k in KINDS)
+    print('Two static cards; desktop day payload:',total,'bytes; light, dark and mobile variants generated.')
 
 
-if __name__=='__main__':
-    main()
+if __name__=='__main__':main()
