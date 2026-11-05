@@ -1,6 +1,7 @@
 """Build self-contained, static Profile cards; no image or font requests at runtime."""
 from pathlib import Path
 import html
+import hashlib
 import json
 import math
 import random
@@ -16,6 +17,7 @@ PALETTES = {
 }
 SANS = "'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif"
 SERIF = "Georgia,'Times New Roman',serif"
+OUTPUTS = {}
 
 
 def text(x, y, value, size=25, color=None, weight=400, family=SANS, italic=False):
@@ -27,7 +29,9 @@ def width(value, size):
 
 
 def lines(value, max_width, size):
-    words = re.findall(r'[A-Za-z0-9]+(?:[-/][A-Za-z0-9]+)*|[^A-Za-z0-9]', value)
+    if '\n' in value:
+        return [line for part in value.split('\n') for line in lines(part,max_width,size)]
+    words = re.findall(r'[A-Za-z0-9]+(?:[-/][A-Za-z0-9]+)*[，。；：、！？）]*|[\u3400-\u9fff][，。；：、！？）]*|[^A-Za-z0-9]', value)
     result, line = [], ''
     for word in words:
         if line and width(line + word, size) > max_width:
@@ -121,12 +125,12 @@ def build(kind, mobile, night):
         desc='跨域 Soft Prompt 共享与 VGGT 几何注入。'
         p,y=paragraph(pad,178,desc,w-2*pad,29 if mobile else 25,46 if mobile else 42);parts.append(p);y+=18
         if mobile:
-            entries=[('基线复现','六域部署与系统评测；贯通模型服务、动作转换与结果记录。'),('方法实现','参数级、行为级与轨迹级 Soft Prompt 蒸馏；GI-RGD、GCRP、Spatial Forcing 几何注入。'),('诊断与追溯','梯度分析、模块隔离与参数替换；交叉诊断损失曲线、表征相关性与 rollout 行为。')]
+            entries=[('基线复现','六域部署与系统评测；贯通模型服务、动作转换与结果记录。'),('方法实现','Soft Prompt 蒸馏\n参数级 · 行为级 · 轨迹级\n几何注入\nGI-RGD · GCRP\nSpatial Forcing'),('诊断与追溯','梯度分析、模块隔离与参数替换；交叉诊断损失曲线、表征相关性与 rollout 行为。')]
             for heading,body in entries:
                 parts += [rule(pad,y,w-pad),text(pad,y+45,heading,29,weight=600)]
                 p,end=paragraph(pad,y+87,body,w-2*pad,29,46,P['muted']);parts.append(p);y=end+24
         else:
-            entries=[('基线复现','六域模型部署与系统评测，贯通模型服务、动作转换与结果记录。'),('方法实现','参数级、行为级与轨迹级 Soft Prompt 蒸馏；GI-RGD、GCRP、Spatial Forcing。'),('诊断与追溯','梯度分析、模块隔离与参数替换；表征相关性与 rollout 行为追踪。')]
+            entries=[('基线复现','六域模型部署与系统评测，贯通模型服务、动作转换与结果记录。'),('方法实现','Soft Prompt 蒸馏\n参数 · 行为 · 轨迹\nGI-RGD · GCRP\nSpatial Forcing'),('诊断与追溯','梯度分析、模块隔离与参数替换；表征相关性与 rollout 行为追踪。')]
             parts.append(rule(pad,y,w-pad));bottoms=[]
             for i,(heading,body) in enumerate(entries):
                 x=pad+i*300;parts.append(text(x,y+50,heading,27,weight=600));p,end=paragraph(x,y+94,body,260,24,40,P['muted']);parts.append(p);bottoms.append(end)
@@ -165,12 +169,13 @@ def build(kind, mobile, night):
 
 
 def picture(kind, alt, link=None):
-    name='assets/cards/'+kind
+    def image(mobile,night):
+        return './assets/cards/'+OUTPUTS[kind,mobile,night]
     value=f'''<picture>
-  <source media="(max-width:1000px) and (prefers-color-scheme:dark)" srcset="./{name}-night-mobile.svg">
-  <source media="(max-width:1000px)" srcset="./{name}-day-mobile.svg">
-  <source media="(prefers-color-scheme:dark)" srcset="./{name}-night.svg">
-  <img src="./{name}-day.svg" width="100%" alt="{html.escape(alt,quote=True)}">
+  <source media="(max-width:1000px) and (prefers-color-scheme:dark)" srcset="{image(True,True)}">
+  <source media="(max-width:1000px)" srcset="{image(True,False)}">
+  <source media="(prefers-color-scheme:dark)" srcset="{image(False,True)}">
+  <img src="{image(False,False)}" width="100%" alt="{html.escape(alt,quote=True)}">
 </picture>'''
     return f'<a href="{link}" title="{html.escape(alt,quote=True)}">\n{value}\n</a>' if link else value
 
@@ -180,7 +185,13 @@ def main():
         for mobile in [False,True]:
             for night in [False,True]:
                 suffix=('-night' if night else '-day')+('-mobile' if mobile else '')
-                (ASSETS/(kind+suffix+'.svg')).write_text(build(kind,mobile,night),encoding='utf-8',newline='\n')
+                content=build(kind,mobile,night)
+                name=kind+suffix+'-'+hashlib.sha256(content.encode()).hexdigest()[:10]+'.svg'
+                OUTPUTS[kind,mobile,night]=name
+                (ASSETS/name).write_text(content,encoding='utf-8',newline='\n')
+    for file in ASSETS.glob('*.svg'):
+        if re.fullmatch(r'(intro|research|skills|minicamp)-(day|night)(-mobile)?(-[a-f0-9]{10})?\.svg',file.name) and file.name not in OUTPUTS.values():
+            file.unlink()
     cards=[
         picture('intro','LHC-PROG · 中南大学计算机科学与技术本科生。具身智能、机器学习、3D 视觉、医学影像处理。访问个人主页 ↗','https://lhc-prog.github.io/'),
         picture('research','研究实践 · X-VLA 跨域 Soft Prompt 共享与 VGGT 几何注入；六域部署、方法实现、诊断与追溯。阅读研究详情 ↗','https://lhc-prog.github.io/#research'),
@@ -194,7 +205,7 @@ def main():
     native += ['','## 技术能力','','Python · C/C++ · Java · PyTorch · Linux · Git','','## 协作实践','','MiniCamp 2026 校园黑客松。'+DATA['practice']['description'],'','</details>']
     body+='\n\n'+'\n'.join(native)+'\n'
     (ROOT/'README.md').write_text(body,encoding='utf-8',newline='\n')
-    total=sum((ASSETS/(kind+'-day.svg')).stat().st_size for kind in ['intro','research','skills','minicamp'])
+    total=sum((ASSETS/OUTPUTS[kind,False,False]).stat().st_size for kind in ['intro','research','skills','minicamp'])
     print('Four static cards; desktop day payload:',total,'bytes; mobile, light and dark variants generated.')
 
 
